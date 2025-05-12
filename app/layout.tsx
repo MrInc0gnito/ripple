@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { SettingsProvider } from "@/contexts/settings-context"
 import { UserProvider } from "@/contexts/user-context"
+import TabCloaking from "@/components/tab-cloaking"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <SettingsProvider>
+          <TabCloaking />
           <UserProvider>{children}</UserProvider>
         </SettingsProvider>
       </body>

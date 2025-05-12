@@ -24,7 +24,7 @@ export default function CreditsModal({ isOpen, onClose }: CreditsModalProps) {
         {/* Content */}
         <div className="p-6 space-y-4">
           <div className="text-center">
-            <h3 className="text-lg font-medium mb-2">Ripple v0.1.1</h3>
+            <h3 className="text-lg font-medium mb-2">RPL v0.1.3</h3>
             <p className="text-white/70">Developed by: WFIS01</p>
           </div>
 

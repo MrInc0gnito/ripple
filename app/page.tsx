@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useEffect, useRef, useState } from "react"
-import { ChevronDown, Code, Github, Search, Settings, User, Wand2, X } from "lucide-react"
+import { ChevronDown, Code, Github, Search, Settings, User, Wand2, X } from 'lucide-react'
 import { useSettings } from "@/contexts/settings-context"
 import { useUser } from "@/contexts/user-context"
 import SettingsMenu from "@/components/settings-menu"
@@ -53,7 +53,7 @@ export default function RipplePage() {
   const [snipeAuthVisible, setSnipeAuthVisible] = useState(false)
   const [isSignupMode, setIsSignupMode] = useState(false)
 
-  const { theme, showDevFunc, setShowDevFunc: updateShowDevFunc } = useSettings()
+  const { theme, showDevFunc, setShowDevFunc: updateShowDevFunc, accentColor } = useSettings()
   const { user, login, signup, logout } = useUser()
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -90,6 +90,47 @@ export default function RipplePage() {
       document.head.removeChild(link)
     }
   }, [])
+
+  // Apply theme based on settings
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      // Remove all theme classes
+      document.body.classList.remove("theme-ripple", "theme-ripple-matte", "light-mode", "low-profile");
+      
+      // Add the appropriate theme class
+      if (theme === "Ripple") {
+        document.body.classList.add("theme-ripple");
+      } else if (theme === "Ripple Matte") {
+        document.body.classList.add("theme-ripple-matte");
+      } else if (theme === "White") {
+        document.body.classList.add("light-mode");
+      } else if (theme === "Low Profile") {
+        document.body.classList.add("low-profile");
+      }
+    }
+  }, [theme]);
+
+  // Apply accent color
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      const root = document.documentElement;
+      
+      // Set accent color based on the selected color
+      if (accentColor === "blue") {
+        root.style.setProperty("--accent-color", "#3b82f6");
+      } else if (accentColor === "purple") {
+        root.style.setProperty("--accent-color", "#8b5cf6");
+      } else if (accentColor === "green") {
+        root.style.setProperty("--accent-color", "#10b981");
+      } else if (accentColor === "red") {
+        root.style.setProperty("--accent-color", "#ef4444");
+      } else if (accentColor === "orange") {
+        root.style.setProperty("--accent-color", "#f59e0b");
+      } else if (accentColor === "pink") {
+        root.style.setProperty("--accent-color", "#ec4899");
+      }
+    }
+  }, [accentColor]);
 
   // Network visualization
   useEffect(() => {
@@ -298,7 +339,7 @@ export default function RipplePage() {
         }
       } catch (error) {
         console.error("Error fetching random text:", error)
-        setRandomText("Welcome to RPL v0.1.2")
+        setRandomText("Welcome to RPL v0.1.1")
         setTypingIndex(0)
         setIsTyping(true)
       }
@@ -852,7 +893,7 @@ export default function RipplePage() {
             <p>2025 SnipeCo.™ all rights reserved</p>
             <p className="mt-2 text-sm">Press Ctrl+Space to open the Highlight Menu</p>
             <button className="text-xs text-gray-500 hover:text-gray-300 mt-2" onClick={() => setCreditsVisible(true)}>
-              RPL v0.1.2
+              RPL v0.1.3
             </button>
           </div>
         </footer>
@@ -1061,7 +1102,7 @@ export default function RipplePage() {
                 setCreditsVisible(true)
               }}
             >
-              RPL v0.1.2
+              RPL v0.1.3
             </button>
           </div>
         </div>

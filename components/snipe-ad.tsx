@@ -1,35 +1,10 @@
 "use client"
 
-import { ExternalLink } from "lucide-react"
-
 interface SnipeAdProps {
   variant?: "small" | "medium" | "large" | "vertical"
-  showFullscreen?: boolean
 }
 
-export default function SnipeAd({ variant = "medium", showFullscreen = false }: SnipeAdProps) {
-  const handleOpenFullscreen = () => {
-    if (typeof window !== "undefined") {
-      // Open in about:blank
-      const newWindow = window.open("about:blank", "_blank")
-      if (newWindow) {
-        newWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>Ripple</title>
-              <link rel="icon" href="https://i.ibb.co/KzftD25N/download-3.png">
-            </head>
-            <body style="margin:0;padding:0;height:100vh;overflow:hidden;background:#000;">
-              <iframe src="https://www.ebay.co.uk/itm/167506178840?itmmeta=01JTXX3B02MB2MV1R1YVJVPDDY&hash=item2700257318:g:YbsAAOSwDntoH613" style="border:none;width:100%;height:100vh;"></iframe>
-            </body>
-          </html>
-        `)
-        newWindow.document.close()
-      }
-    }
-  }
-
+export default function SnipeAd({ variant = "medium" }: SnipeAdProps) {
   if (variant === "vertical") {
     return (
       <div className="bg-[rgba(30,30,30,0.5)] rounded-lg p-3 text-center text-gray-400 h-full flex flex-col justify-between">
@@ -44,15 +19,6 @@ export default function SnipeAd({ variant = "medium", showFullscreen = false }: 
           >
             Open
           </a>
-          {showFullscreen && (
-            <button
-              onClick={handleOpenFullscreen}
-              className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors flex items-center justify-center gap-1"
-            >
-              <ExternalLink className="w-4 h-4" />
-              <span>Fullscreen</span>
-            </button>
-          )}
         </div>
       </div>
     )
@@ -61,10 +27,7 @@ export default function SnipeAd({ variant = "medium", showFullscreen = false }: 
   if (variant === "small") {
     return (
       <div className="bg-[rgba(30,30,30,0.5)] rounded-lg p-2 text-center text-gray-400 text-xs flex items-center justify-between">
-        <span>
-          <span className="text-xs text-white/60 mr-1">SnipeAd:</span>
-          Need a PC? Bid now
-        </span>
+        <span>Need a PC? Bid now</span>
         <div className="flex gap-1">
           <a
             href="https://www.ebay.co.uk/itm/167506178840?itmmeta=01JTXX3B02MB2MV1R1YVJVPDDY&hash=item2700257318:g:YbsAAOSwDntoH613"
@@ -74,15 +37,6 @@ export default function SnipeAd({ variant = "medium", showFullscreen = false }: 
           >
             Open
           </a>
-          {showFullscreen && (
-            <button
-              onClick={handleOpenFullscreen}
-              className="p-1 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors"
-              title="Open in fullscreen"
-            >
-              <ExternalLink className="w-3 h-3" />
-            </button>
-          )}
         </div>
       </div>
     )
@@ -103,15 +57,6 @@ export default function SnipeAd({ variant = "medium", showFullscreen = false }: 
           >
             Open
           </a>
-          {showFullscreen && (
-            <button
-              onClick={handleOpenFullscreen}
-              className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors flex items-center gap-1"
-            >
-              <ExternalLink className="w-4 h-4" />
-              <span>Fullscreen</span>
-            </button>
-          )}
         </div>
       </div>
     )
@@ -131,15 +76,6 @@ export default function SnipeAd({ variant = "medium", showFullscreen = false }: 
         >
           Open
         </a>
-        {showFullscreen && (
-          <button
-            onClick={handleOpenFullscreen}
-            className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors flex items-center gap-1"
-          >
-            <ExternalLink className="w-4 h-4" />
-            <span>Fullscreen</span>
-          </button>
-        )}
       </div>
     </div>
   )

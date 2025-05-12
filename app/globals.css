@@ -6,6 +6,7 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 18, 18, 18;
   --background-end-rgb: 18, 18, 18;
+  --accent-color: #3b82f6;
 }
 
 body {
@@ -121,16 +122,20 @@ body {
   background: rgb(var(--background-start-rgb));
 }
 
-.light-mode .bg-\[rgba$30\,30\,30\,0\.7$\] {
+.light-mode .bg-\[rgba$$30\,30\,30\,0\.7$$\] {
   background-color: rgba(240, 240, 240, 0.7);
 }
 
-.light-mode .bg-\[rgba$30\,30\,30\,0\.4$\] {
+.light-mode .bg-\[rgba$$30\,30\,30\,0\.5$$\] {
+  background-color: rgba(240, 240, 240, 0.5);
+}
+
+.light-mode .bg-\[rgba$$30\,30\,30\,0\.4$$\] {
   background-color: rgba(240, 240, 240, 0.4);
 }
 
 .light-mode .text-white {
-  coloror: rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
 }
 
 .light-mode .text-gray-400 {
@@ -158,6 +163,31 @@ body {
 .low-profile .animate-pulse,
 .low-profile .animate-spin {
   animation: none !important;
+}
+
+/* Accent color classes */
+.accent-bg {
+  background-color: var(--accent-color);
+}
+
+.accent-text {
+  color: var(--accent-color);
+}
+
+.accent-border {
+  border-color: var(--accent-color);
+}
+
+.accent-hover:hover {
+  background-color: var(--accent-color);
+}
+
+.accent-button {
+  background-color: var(--accent-color);
+}
+
+.accent-button:hover {
+  opacity: 0.9;
 }
 
 @layer utilities {

@@ -5,6 +5,7 @@ import { ArrowLeft, Shield } from "lucide-react"
 import LoadingAnimation from "@/components/loading-animation"
 import { useSettings } from "@/contexts/settings-context"
 import SnipeAd from "@/components/snipe-ad"
+import { useUser } from "@/contexts/user-context"
 
 interface AppData {
   url: string
@@ -15,6 +16,9 @@ export default function AppPage() {
   const [appData, setAppData] = useState<AppData | null>(null)
   const [loading, setLoading] = useState(true)
   const [appContent, setAppContent] = useState<string>("")
+  const [showWideDisplayAlert, setShowWideDisplayAlert] = useState(false)
+  const { user } = useUser()
+  const { theme, cloak } = useSettings()
   const { displaySnipeShield } = useSettings()
 
   useEffect(() => {
@@ -77,6 +81,32 @@ export default function AppPage() {
     }
   }
 
+  const handleWiden = () => {
+    if (typeof window !== "undefined" && appData) {
+      // Open in about:blank with full width
+      const newWindow = window.open("about:blank", "_blank")
+      if (newWindow) {
+        newWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Ripple</title>
+            <link rel="icon" href="https://i.ibb.co/KzftD25N/download-3.png">
+          </head>
+          <body style="margin:0;padding:0;height:100vh;overflow:hidden;">
+            <iframe src="${appData.url}" style="border:none;width:100%;height:100vh;"></iframe>
+          </body>
+        </html>
+      `)
+        newWindow.document.close()
+        setShowWideDisplayAlert(true)
+        setTimeout(() => {
+          setShowWideDisplayAlert(false)
+        }, 5000)
+      }
+    }
+  }
+
   return (
     <>
       {/* Loading Animation */}
@@ -100,10 +130,27 @@ export default function AppPage() {
             <span>Back to Ripple</span>
           </button>
 
-          <div className="w-[200px]">
-            <SnipeAd variant="small" />
+          <div className="flex items-center gap-4">
+            {user?.isSnipePlus && (
+              <button
+                onClick={handleWiden}
+                className="px-3 py-1 bg-blue-600 hover:bg-blue-500 rounded text-white transition-colors"
+              >
+                Widen
+              </button>
+            )}
+            <div className="w-[200px]">
+              <SnipeAd variant="small" />
+            </div>
           </div>
         </header>
+
+        {/* Wide Display Alert */}
+        {showWideDisplayAlert && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-lg z-[200] animate-fadeIn">
+            Press FN+F11 to enable Wide-Display
+          </div>
+        )}
 
         {/* App Content */}
         <div className="flex-1 bg-black">

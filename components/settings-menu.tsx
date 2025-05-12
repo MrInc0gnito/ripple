@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { LogOut, Shield, User, X } from "lucide-react"
 import { useSettings } from "@/contexts/settings-context"
 import { useUser } from "@/contexts/user-context"
+import SnipePlusSettings from "@/components/snipe-plus-settings"
 
 interface SettingsMenuProps {
   isOpen: boolean
@@ -121,6 +122,14 @@ export default function SettingsMenu({ isOpen, onClose, openConsole }: SettingsM
             >
               Account
             </button>
+            {user && (
+              <button
+                className={`px-4 py-2 whitespace-nowrap ${activeTab === "snipeplus" ? "text-white border-b-2 border-white" : "text-white/60"}`}
+                onClick={() => setActiveTab("snipeplus")}
+              >
+                SnipePlus
+              </button>
+            )}
             <button
               className={`px-4 py-2 whitespace-nowrap ${activeTab === "reset" ? "text-white border-b-2 border-white" : "text-white/60"}`}
               onClick={() => setActiveTab("reset")}
@@ -399,6 +408,10 @@ export default function SettingsMenu({ isOpen, onClose, openConsole }: SettingsM
               </div>
             )}
 
+            {activeTab === "snipeplus" && (
+              <SnipePlusSettings isLoggedIn={!!user} isSnipePlus={user?.isSnipePlus || false} />
+            )}
+
             {activeTab === "reset" && (
               <div className="space-y-6">
                 <div>
@@ -452,7 +465,7 @@ export default function SettingsMenu({ isOpen, onClose, openConsole }: SettingsM
               className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white transition-colors"
               onClick={handleClose}
             >
-              Cancel
+              Close
             </button>
             <button
               className={`px-3 py-1 ${hasChanges ? "bg-blue-600 hover:bg-blue-500" : "bg-gray-600 cursor-not-allowed"} rounded text-white transition-colors`}

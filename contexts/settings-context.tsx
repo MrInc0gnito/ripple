@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 
 type ThemeType = "Ripple" | "Ripple Matte" | "White" | "Low Profile"
 type CloakType = "Ripple" | "Google" | "Teams" | "Ghost"
-type AccentColorType = "blue" | "purple" | "green" | "red" | "orange" | "pink"
+type AccentColorType = "blue" | "red" | "green" | "orange" | "purple"
 
 interface SettingsContextType {
   // Current settings (applied)
@@ -16,6 +16,9 @@ interface SettingsContextType {
   escapeUrl: string
   displaySnipeShield: boolean
   showDevFunc: boolean
+  snipeSecureEnabled: boolean
+  adsEnabled: boolean
+  wideDisplayEnabled: boolean
 
   // Pending settings (not yet applied)
   pendingSettings: {
@@ -26,6 +29,9 @@ interface SettingsContextType {
     escapeKey: string
     escapeUrl: string
     displaySnipeShield: boolean
+    snipeSecureEnabled: boolean
+    adsEnabled: boolean
+    wideDisplayEnabled: boolean
   }
 
   // Methods
@@ -36,6 +42,9 @@ interface SettingsContextType {
   setPendingEscapeKey: (key: string) => void
   setPendingEscapeUrl: (url: string) => void
   setPendingDisplaySnipeShield: (enabled: boolean) => void
+  setPendingSnipeSecureEnabled: (enabled: boolean) => void
+  setPendingAdsEnabled: (enabled: boolean) => void
+  setPendingWideDisplayEnabled: (enabled: boolean) => void
 
   applySettings: () => void
   resetAppearance: () => void
@@ -44,6 +53,7 @@ interface SettingsContextType {
   resetAllToDefaults: () => void
 
   updateShowDevFunc: (show: boolean) => void
+  getAccentColorHex: (color: AccentColorType) => string
 }
 
 const defaultSettings = {
@@ -55,6 +65,9 @@ const defaultSettings = {
   escapeUrl: "https://google.com",
   displaySnipeShield: true,
   showDevFunc: false,
+  snipeSecureEnabled: false,
+  adsEnabled: true,
+  wideDisplayEnabled: false,
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
@@ -69,6 +82,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [escapeUrl, setEscapeUrl] = useState(defaultSettings.escapeUrl)
   const [displaySnipeShield, setDisplaySnipeShield] = useState(defaultSettings.displaySnipeShield)
   const [showDevFunc, setShowDevFunc] = useState(defaultSettings.showDevFunc)
+  const [snipeSecureEnabled, setSnipeSecureEnabled] = useState(defaultSettings.snipeSecureEnabled)
+  const [adsEnabled, setAdsEnabled] = useState(defaultSettings.adsEnabled)
+  const [wideDisplayEnabled, setWideDisplayEnabled] = useState(defaultSettings.wideDisplayEnabled)
 
   // Pending settings (not yet applied)
   const [pendingSettings, setPendingSettings] = useState({
@@ -79,6 +95,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     escapeKey: defaultSettings.escapeKey,
     escapeUrl: defaultSettings.escapeUrl,
     displaySnipeShield: defaultSettings.displaySnipeShield,
+    snipeSecureEnabled: defaultSettings.snipeSecureEnabled,
+    adsEnabled: defaultSettings.adsEnabled,
+    wideDisplayEnabled: defaultSettings.wideDisplayEnabled,
   })
 
   // Load settings from localStorage on initial render
@@ -97,6 +116,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         setEscapeUrl(parsedSettings.escapeUrl || defaultSettings.escapeUrl)
         setDisplaySnipeShield(parsedSettings.displaySnipeShield ?? defaultSettings.displaySnipeShield)
         setShowDevFunc(parsedSettings.showDevFunc ?? defaultSettings.showDevFunc)
+        setSnipeSecureEnabled(parsedSettings.snipeSecureEnabled ?? defaultSettings.snipeSecureEnabled)
+        setAdsEnabled(parsedSettings.adsEnabled ?? defaultSettings.adsEnabled)
+        setWideDisplayEnabled(parsedSettings.wideDisplayEnabled ?? defaultSettings.wideDisplayEnabled)
 
         // Set pending settings to match applied settings
         setPendingSettings({
@@ -107,10 +129,53 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           escapeKey: parsedSettings.escapeKey || defaultSettings.escapeKey,
           escapeUrl: parsedSettings.escapeUrl || defaultSettings.escapeUrl,
           displaySnipeShield: parsedSettings.displaySnipeShield ?? defaultSettings.displaySnipeShield,
+          snipeSecureEnabled: parsedSettings.snipeSecureEnabled ?? defaultSettings.snipeSecureEnabled,
+          adsEnabled: parsedSettings.adsEnabled ?? defaultSettings.adsEnabled,
+          wideDisplayEnabled: parsedSettings.wideDisplayEnabled ?? defaultSettings.wideDisplayEnabled,
         })
       }
     }
   }, [])
+
+  // Apply theme and accent color to document
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Apply theme
+      document.body.classList.remove("theme-ripple", "theme-ripple-matte", "light-mode", "low-profile")
+
+      if (theme === "Ripple") {
+        document.body.classList.add("theme-ripple")
+      } else if (theme === "Ripple Matte") {
+        document.body.classList.add("theme-ripple-matte")
+      } else if (theme === "White") {
+        document.body.classList.add("light-mode")
+      } else if (theme === "Low Profile") {
+        document.body.classList.add("low-profile")
+      }
+
+      // Apply accent color
+      document.documentElement.style.setProperty("--accent-color", getAccentColorHex(accentColor))
+
+      // Apply tab cloaking
+      if (cloak === "Google") {
+        document.title = "Google"
+        const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+        if (favicon) favicon.href = "https://www.google.com/favicon.ico"
+      } else if (cloak === "Teams") {
+        document.title = "Microsoft Teams"
+        const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+        if (favicon) favicon.href = "https://teams.microsoft.com/favicon.ico"
+      } else if (cloak === "Ghost") {
+        document.title = " "
+        const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+        if (favicon) favicon.href = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+      } else {
+        document.title = "Ripple"
+        const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+        if (favicon) favicon.href = "https://i.ibb.co/KzftD25N/download-3.png"
+      }
+    }
+  }, [theme, accentColor, cloak])
 
   // Save settings to localStorage whenever they change
   useEffect(() => {
@@ -124,10 +189,43 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         escapeUrl,
         displaySnipeShield,
         showDevFunc,
+        snipeSecureEnabled,
+        adsEnabled,
+        wideDisplayEnabled,
       }
       localStorage.setItem("ripple-settings", JSON.stringify(settingsToSave))
     }
-  }, [theme, cloak, accentColor, escapeKeyEnabled, escapeKey, escapeUrl, displaySnipeShield, showDevFunc])
+  }, [
+    theme,
+    cloak,
+    accentColor,
+    escapeKeyEnabled,
+    escapeKey,
+    escapeUrl,
+    displaySnipeShield,
+    showDevFunc,
+    snipeSecureEnabled,
+    adsEnabled,
+    wideDisplayEnabled,
+  ])
+
+  // Helper function to get hex value for accent color
+  const getAccentColorHex = (color: AccentColorType): string => {
+    switch (color) {
+      case "blue":
+        return "#3b82f6"
+      case "red":
+        return "#ef4444"
+      case "green":
+        return "#10b981"
+      case "orange":
+        return "#f59e0b"
+      case "purple":
+        return "#8b5cf6"
+      default:
+        return "#3b82f6"
+    }
+  }
 
   // Methods to update pending settings
   const setPendingTheme = (theme: ThemeType) => {
@@ -158,6 +256,18 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setPendingSettings((prev) => ({ ...prev, displaySnipeShield: enabled }))
   }
 
+  const setPendingSnipeSecureEnabled = (enabled: boolean) => {
+    setPendingSettings((prev) => ({ ...prev, snipeSecureEnabled: enabled }))
+  }
+
+  const setPendingAdsEnabled = (enabled: boolean) => {
+    setPendingSettings((prev) => ({ ...prev, adsEnabled: enabled }))
+  }
+
+  const setPendingWideDisplayEnabled = (enabled: boolean) => {
+    setPendingSettings((prev) => ({ ...prev, wideDisplayEnabled: enabled }))
+  }
+
   // Method to apply pending settings
   const applySettings = () => {
     setTheme(pendingSettings.theme)
@@ -167,11 +277,18 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setEscapeKey(pendingSettings.escapeKey)
     setEscapeUrl(pendingSettings.escapeUrl)
     setDisplaySnipeShield(pendingSettings.displaySnipeShield)
+    setSnipeSecureEnabled(pendingSettings.snipeSecureEnabled)
+    setAdsEnabled(pendingSettings.adsEnabled)
+    setWideDisplayEnabled(pendingSettings.wideDisplayEnabled)
   }
 
   // Reset functions
   const resetAppearance = () => {
-    setPendingSettings((prev) => ({ ...prev, theme: defaultSettings.theme, accentColor: defaultSettings.accentColor }))
+    setPendingSettings((prev) => ({
+      ...prev,
+      theme: defaultSettings.theme,
+      accentColor: defaultSettings.accentColor,
+    }))
   }
 
   const resetCloaking = () => {
@@ -185,6 +302,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       escapeKey: defaultSettings.escapeKey,
       escapeUrl: defaultSettings.escapeUrl,
       displaySnipeShield: defaultSettings.displaySnipeShield,
+      snipeSecureEnabled: defaultSettings.snipeSecureEnabled,
     }))
   }
 
@@ -197,6 +315,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       escapeKey: defaultSettings.escapeKey,
       escapeUrl: defaultSettings.escapeUrl,
       displaySnipeShield: defaultSettings.displaySnipeShield,
+      snipeSecureEnabled: defaultSettings.snipeSecureEnabled,
+      adsEnabled: defaultSettings.adsEnabled,
+      wideDisplayEnabled: defaultSettings.wideDisplayEnabled,
     })
     setTheme(defaultSettings.theme)
     setCloak(defaultSettings.cloak)
@@ -206,6 +327,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setEscapeUrl(defaultSettings.escapeUrl)
     setDisplaySnipeShield(defaultSettings.displaySnipeShield)
     setShowDevFunc(defaultSettings.showDevFunc)
+    setSnipeSecureEnabled(defaultSettings.snipeSecureEnabled)
+    setAdsEnabled(defaultSettings.adsEnabled)
+    setWideDisplayEnabled(defaultSettings.wideDisplayEnabled)
   }
 
   // Function to update showDevFunc
@@ -222,6 +346,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     escapeUrl,
     displaySnipeShield,
     showDevFunc,
+    snipeSecureEnabled,
+    adsEnabled,
+    wideDisplayEnabled,
     pendingSettings,
     setPendingTheme,
     setPendingCloak,
@@ -230,12 +357,16 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setPendingEscapeKey,
     setPendingEscapeUrl,
     setPendingDisplaySnipeShield,
+    setPendingSnipeSecureEnabled,
+    setPendingAdsEnabled,
+    setPendingWideDisplayEnabled,
     applySettings,
     resetAppearance,
     resetCloaking,
     resetSecurity,
     resetAllToDefaults,
     updateShowDevFunc,
+    getAccentColorHex,
   }
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>
